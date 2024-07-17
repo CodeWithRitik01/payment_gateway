@@ -56,9 +56,9 @@ jobs:
    needs: build
    runs-on: [aws-ec2]
    steps:
-     - name: Pull Image from docker hub
-       run: docker pull payment_gateway
+     - name: Pull image from docker hub
+       run: docker pull CodeWithRitik01/payment_gateway
      - name: Delete old container
        run: docker rm -f payment_gateway-container
      - name: Run docker container
-       run: docker run -d -p 3000:3000 --name payment_gateway-container payment_gateway
+       run: docker run -d -p 3000:3000 --name payment_gateway-container CodeWithRitik01/payment_gateway
