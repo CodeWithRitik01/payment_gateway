@@ -53,12 +53,24 @@ jobs:
       run: docker push ${{ secrets.DOCKER_USERNAME }}/payment_gateway
 
   deploy:
-   needs: build
-   runs-on: [aws-ec2]
-   steps:
-     - name: Pull image from docker hub
-       run: docker pull CodeWithRitik01/payment_gateway
-     - name: Delete old container
-       run: docker rm -f payment_gateway-container
-     - name: Run docker container
-       run: docker run -d -p 3000:3000 --name payment_gateway-container CodeWithRitik01/payment_gateway
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v2
+
+    - name: Install SSH client
+      run: sudo apt-get install -y openssh-client
+
+    - name: SSH to EC2 and deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/payment_gateway
+          docker rm -f payment_gateway-container || true
+          docker run -d -p 3000:3000 --name payment_gateway-container ${{ secrets.DOCKER_USERNAME }}/payment_gateway
