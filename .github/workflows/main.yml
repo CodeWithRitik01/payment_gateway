@@ -51,3 +51,14 @@ jobs:
 
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/payment_gateway
+
+  deploy:
+   needs: build
+   runs-on: [aws-ec2]
+   steps:
+     - name: Pull Image from docker hub
+       run: docker pull payment_gateway
+     - name: Delete old container
+       run: docker rm -f payment_gateway-container
+     - name: Run docker container
+       run: docker run -d -p 3000:3000 --name payment_gateway-container payment_gateway
