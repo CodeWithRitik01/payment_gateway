@@ -1,7 +1,7 @@
 FROM node:20
 
 # Create app directory
-WORKDIR /usr/index
+WORKDIR /usr/app
 
 # Install app dependencies
 COPY package*.json ./
@@ -14,4 +14,4 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 3000
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "app.js" ]
